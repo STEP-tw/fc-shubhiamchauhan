@@ -7,16 +7,13 @@ const send = function(res, statusCode, content) {
 };
 
 const app = (req, res) => {
-  if (req.url == "/favicon.ico") {
-    res.end();
-    return;
-  }
   fs.readFile("." + req.url, (err, chunk) => {
+    if (err) {
+      send(res, 404, "Invalid request");
+      return;
+    }
     send(res, 200, chunk);
   });
-
 };
-
-// Export a function that can act as a handler
 
 module.exports = app;
