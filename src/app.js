@@ -6,10 +6,10 @@ const send = function(res, statusCode, content) {
   res.end();
 };
 
-const getRequestedFile = (url) => {
-  if(url == '/') return './index.html';
+const getRequestedFile = url => {
+  if (url == "/") return "./index.html";
   return "." + url;
-}
+};
 
 const app = (req, res) => {
   fs.readFile(getRequestedFile(req.url), (err, chunk) => {
