@@ -1,7 +1,7 @@
 const blink = function(content) {
-  content.style.display = "none";
+  content.style.opacity = 0;
   setTimeout(() => {
-    content.style.display = "block";
+    content.style.opacity = 100;
   }, 1000);
 };
 
