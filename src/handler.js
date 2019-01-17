@@ -1,4 +1,3 @@
-/****Framework start */
 const isMatching = (req, route) => {
   if (route.method && req.method != route.method) return false;
   return true;

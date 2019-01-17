@@ -27,7 +27,6 @@ const send = (res, content, statusCode = 200) => {
 
 const sendNotFound = (req, res) => {
   res.statusCode = 404;
-  res.write("bad farmaish");
   res.end();
 };
 
@@ -40,7 +39,7 @@ const readContent = function(res, url) {
   const path = getURLPath(url);
   fs.readFile(path, (err, content) => {
     if (err) {
-      send(res, "Invalid_Request", 404);
+      send(res, "File Not Found", 404);
       return;
     }
     send(res, content);
@@ -93,11 +92,11 @@ const renderGuestBook = (req, res) => {
 };
 
 const renderError = (req, res, err) => {
-  send(res);
+  send(res, "Server Unresponding", 500);
 };
 
 app.use(readBody);
-// app.use(logRequest);
+app.use(logRequest);
 app.get(renderURL);
 app.post("/guestBook.html", renderGuestBook);
 app.use(sendNotFound);
