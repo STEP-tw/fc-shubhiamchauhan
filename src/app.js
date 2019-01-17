@@ -7,8 +7,8 @@ const send = function(res, statusCode, content) {
 };
 
 const getRequestedFile = url => {
-  if (url == "/") return "./index.html";
-  return "." + url;
+  if (url == "/") return "./Public/index.html";
+  return "./Public" + url;
 };
 
 const app = (req, res) => {
