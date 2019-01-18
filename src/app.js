@@ -2,6 +2,7 @@ const fs = require("fs");
 const comments = require("./comments.json");
 const Handler = require("./handler.js");
 const app = new Handler();
+const decodingKeys = require('./decodingKeys.json');
 
 const readBody = (req, res, next) => {
   let content = "";
@@ -48,6 +49,7 @@ const readContent = function(res, url) {
 
 const renderURL = (req, res) => {
   let url = req.url;
+  if(url == '/guestBook.html') return organiseComments(req, res);
   readContent(res, url);
 };
 
@@ -68,27 +70,34 @@ const getMessage = (res, messageData) => {
   }</p>`;
 };
 
-const organiseComments = function(res) {
+const decodeText = (content) => {
+  let result = content;
+  Object.keys(decodingKeys).forEach(x => {
+    result = result.replace(new RegExp(`\\${x}`,'g'), decodingKeys[x]);
+  });
+  return result;
+}
+
+const organiseComments = function(req, res) {
   fs.readFile('./Public/guestBook.html', (err, content)=>{
     comments.forEach(data => {
       let message = getMessage(res, data);
       content += message;
     });
-    send(res, content)
+    let text = decodeText(content)
+    send(res, text);
   })
 };
 
 const renderGuestBook = (req, res) => {
   const text = req.body;
-  console.log(text, "text");
   let { name, comment } = readArgs(text);
-  console.log(readArgs(text));
   let date = new Date();
   comments.unshift({ name, comment, date: date.toLocaleString() });
   fs.writeFile('./src/comments.json', JSON.stringify(comments), (err) => {
     return;
   });
-  organiseComments(res);
+  organiseComments(req,res);
 };
 
 const renderError = (req, res, err) => {
