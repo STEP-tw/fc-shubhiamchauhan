@@ -2,7 +2,7 @@ const fs = require("fs");
 const comments = require("./comments.json");
 const Handler = require("./handler.js");
 const app = new Handler();
-const decodingKeys = require('./decodingKeys.json');
+const decodingKeys = require("./decodingKeys.json");
 
 const readBody = (req, res, next) => {
   let content = "";
@@ -49,7 +49,7 @@ const readContent = function(res, url) {
 
 const renderURL = (req, res) => {
   let url = req.url;
-  if(url == '/guestBook.html') return organiseComments(req, res);
+  if (url == "/guestBook.html") return organiseComments(req, res);
   readContent(res, url);
 };
 
@@ -70,23 +70,23 @@ const getMessage = (res, messageData) => {
   }</p>`;
 };
 
-const decodeText = (content) => {
+const decodeText = content => {
   let result = content;
   Object.keys(decodingKeys).forEach(x => {
-    result = result.replace(new RegExp(`\\${x}`,'g'), decodingKeys[x]);
+    result = result.replace(new RegExp(`\\${x}`, "g"), decodingKeys[x]);
   });
   return result;
-}
+};
 
 const organiseComments = function(req, res) {
-  fs.readFile('./Public/guestBook.html', (err, content)=>{
+  fs.readFile("./Public/guestBook.html", (err, content) => {
     comments.forEach(data => {
       let message = getMessage(res, data);
       content += message;
     });
-    let text = decodeText(content)
+    let text = decodeText(content) + '</div></body></html>';
     send(res, text);
-  })
+  });
 };
 
 const renderGuestBook = (req, res) => {
@@ -94,10 +94,10 @@ const renderGuestBook = (req, res) => {
   let { name, comment } = readArgs(text);
   let date = new Date();
   comments.unshift({ name, comment, date: date.toLocaleString() });
-  fs.writeFile('./src/comments.json', JSON.stringify(comments), (err) => {
+  fs.writeFile("./src/comments.json", JSON.stringify(comments), err => {
     return;
   });
-  organiseComments(req,res);
+  organiseComments(req, res);
 };
 
 const renderError = (req, res, err) => {
