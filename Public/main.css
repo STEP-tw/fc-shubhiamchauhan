@@ -18,6 +18,23 @@
   color: orange;
 }
 
-.commentBox{
-  border-top:2px solid black;
+.commentBox {
+  border-top: 2px solid black;
+}
+
+.button {
+  height: 20px;
+  width: 70px;
+  font-size: 12px;
+  background-color: paleturquoise;
+}
+
+.nameBox {
+  height: 20px;
+  width: 150px;
+  font-size: 12px;
+}
+
+.homeLink{
+  color:purple;
 }

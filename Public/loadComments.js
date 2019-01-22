@@ -23,8 +23,7 @@ const loadComments = function() {
   clearMessageArea();
   fetch("/getComments", { method: "GET" })
     .then(response => response.json())
-    .catch(err => {
-    })
+    .catch(err => {})
     .then(myJson => {
       myJson.forEach(data => {
         insertMessage(data);
