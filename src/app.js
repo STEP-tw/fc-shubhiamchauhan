@@ -14,7 +14,7 @@ const comments = getComments();
 const readBody = (req, res, next) => {
   let content = "";
   req.on("data", chunk => {
-    content += chunk
+    content += chunk;
   });
   req.on("end", () => {
     req.body = content;
@@ -59,7 +59,7 @@ const readContent = function(res, url) {
 const renderURL = (req, res) => {
   let url = req.url;
   if (url == "/getComments") {
-    send(res, JSON.stringify(getComments()), 200);
+    send(res, JSON.stringify(comments), 200);
     return;
   }
   readContent(res, url);
@@ -69,8 +69,8 @@ const renderGuestBook = (req, res) => {
   const text = JSON.parse(req.body);
   let { name, comment } = text;
   let date = new Date();
-  comments.unshift({ name, comment, date: date.toUTCString()});
-  fs.writeFileSync("./src/comments.json", JSON.stringify(comments));
+  comments.unshift({ name, comment, date: date.toUTCString() });
+  fs.writeFile("./src/comments.json", JSON.stringify(comments), err => {});
   renderURL(req, res);
 };
 
