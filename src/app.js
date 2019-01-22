@@ -1,12 +1,21 @@
 const fs = require("fs");
-const comments = require("./comments.json");
 const Handler = require("./handler.js");
 const app = new Handler();
-const decodingKeys = require("./decodingKeys.json");
+
+const getComments = () => {
+  if (!fs.existsSync("./src/comments.json")) {
+    fs.writeFileSync("./src/comments.json", "[]");
+  }
+  return JSON.parse(fs.readFileSync("./src/comments.json", "utf8"));
+};
+
+const comments = getComments();
 
 const readBody = (req, res, next) => {
   let content = "";
-  req.on("data", chunk => (content += chunk));
+  req.on("data", chunk => {
+    content += chunk
+  });
   req.on("end", () => {
     req.body = content;
     next();
@@ -49,55 +58,20 @@ const readContent = function(res, url) {
 
 const renderURL = (req, res) => {
   let url = req.url;
-  if (url == "/guestBook.html") return organiseComments(req, res);
+  if (url == "/getComments") {
+    send(res, JSON.stringify(getComments()), 200);
+    return;
+  }
   readContent(res, url);
 };
 
-const readArgs = text => {
-  let args = {};
-  const splitKeyValue = pair => pair.split("=");
-  const assignKeyValueToArgs = ([key, value]) => (args[key] = value);
-  text
-    .split("&")
-    .map(splitKeyValue)
-    .forEach(assignKeyValueToArgs);
-  return args;
-};
-
-const getMessage = (res, messageData) => {
-  return `<h2>${messageData.name}<h2><h3>${messageData.date}</h3><p>${
-    messageData.comment
-  }</p>`;
-};
-
-const decodeText = content => {
-  let result = content;
-  Object.keys(decodingKeys).forEach(x => {
-    result = result.replace(new RegExp(`\\${x}`, "g"), decodingKeys[x]);
-  });
-  return result;
-};
-
-const organiseComments = function(req, res) {
-  fs.readFile("./Public/guestBook.html", (err, content) => {
-    comments.forEach(data => {
-      let message = getMessage(res, data);
-      content += message;
-    });
-    let text = decodeText(content) + '</div></body></html>';
-    send(res, text);
-  });
-};
-
 const renderGuestBook = (req, res) => {
-  const text = req.body;
-  let { name, comment } = readArgs(text);
+  const text = JSON.parse(req.body);
+  let { name, comment } = text;
   let date = new Date();
-  comments.unshift({ name, comment, date: date.toLocaleString() });
-  fs.writeFile("./src/comments.json", JSON.stringify(comments), err => {
-    return;
-  });
-  organiseComments(req, res);
+  comments.unshift({ name, comment, date: date.toUTCString()});
+  fs.writeFileSync("./src/comments.json", JSON.stringify(comments));
+  renderURL(req, res);
 };
 
 const renderError = (req, res, err) => {
@@ -107,7 +81,7 @@ const renderError = (req, res, err) => {
 app.use(readBody);
 app.use(logRequest);
 app.get(renderURL);
-app.post("/guestBook.html", renderGuestBook);
+app.post("/getComments", renderGuestBook);
 app.use(sendNotFound);
 app.error(renderError);
 module.exports = app.handleRequest.bind(app);

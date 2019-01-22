@@ -2,14 +2,15 @@
   <head>
     <title>Guest Book</title>
     <link rel="stylesheet" type="text/css" href="main.css" />
+    <script src="loadComments.js"></script>
   </head>
   <body>
     <p class="subPageHeadline">
       <a href="/" style="color:purple;"><<</a>Guest Book
     </p>
     <h1>Leave a comment</h1>
-    <form method="POST" id="usrform">
-      Name: <input type="text" name="name" /></br>
+    <form id="usrform">
+      Name: <input type="text" name="name" id="name" /></br>
       Comment:
       <textarea
         rows="10"
@@ -17,7 +18,13 @@
         name="comment"
         form="usrform"
         style="margin-top:2px"
-      ></textarea></br>
-      <input type="submit" name="submit" value="Submit" width="100"/>
-    </form>
-    <div class="commentBox">
+        id="commentMessage"
+        ></textarea></br>
+      </form>
+      <button style="height:25px; width:100px; font-size: 15px" id="submit">submit</button>
+    <div class="commentBox" id="commentBox">
+      <p style="font-size: 25px; font-weight: 700">Comments <button id="refresh">&#x21bb</button></p>
+      <div id="commentArea"></div>
+    </div>
+  </body>
+</html>
