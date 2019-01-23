@@ -125,12 +125,13 @@ const renderCommentPage = function(req, res) {
 const renderLogout = function(req, res){
   const cookie = req.headers["cookie"];
   delete userData[cookie];
-  res.setHeader("Set-Cookie", '');
+  const username = cookie.split('=')[0]; 
+  res.setHeader("Set-Cookie", `${username}=;Expires= Thu, 1 JAN 1970 00:00:01 GMT;`);
   send(res, html.loginTempelate);
 }
 
 app.use(readBody);
-app.use(logRequest);
+// app.use(logRequest);
 app.get(renderURL);
 app.post('/logout', renderLogout)
 app.post("/getComments", renderGuestBook);
