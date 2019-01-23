@@ -32,8 +32,7 @@ const loadComments = function() {
 };
 
 const getBody = () => {
-  let name = document.getElementById("name").value;
-  document.getElementById("name").value = "";
+  let name = document.getElementById("name").innerText;
   let comment = document.getElementById("commentMessage").value;
   document.getElementById("commentMessage").value = "";
   return { name, comment };
@@ -49,7 +48,9 @@ const updateComments = function() {
     },
     body: JSON.stringify(data)
   })
-    .then(response => response.json())
+    .then(response => {
+      return response.json();
+    })
     .then(myJson => {
       myJson.forEach(data => {
         insertMessage(data);
@@ -59,8 +60,8 @@ const updateComments = function() {
 
 window.onload = () => {
   loadComments();
-  const submit = document.getElementById("submit");
-  submit.onclick = updateComments;
   const refresh = document.getElementById("refresh");
   refresh.onclick = loadComments;
+  const submit = document.getElementById("submit");
+  if (submit) submit.onclick = updateComments;
 };

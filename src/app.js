@@ -1,6 +1,7 @@
 const fs = require("fs");
 const Handler = require("./handler.js");
 const app = new Handler();
+const html = require("./templates.js");
 
 const getComments = () => {
   if (!fs.existsSync("./src/comments.json")) {
@@ -28,6 +29,14 @@ const logRequest = (req, res, next) => {
   console.log("body =>", req.body);
   next();
 };
+
+const readArgs = text => {
+  let args = {};
+  const splitKeyValue = pair => pair.split('=');
+  const assignKeyValueToArgs = ([key, value]) => args[key] = value;
+  text.split('&').map(splitKeyValue).forEach(assignKeyValueToArgs);
+  return args;
+}
 
 const send = (res, content, statusCode = 200) => {
   res.statusCode = statusCode;
@@ -62,6 +71,7 @@ const renderURL = (req, res) => {
     send(res, JSON.stringify(comments), 200);
     return;
   }
+  if (url == "/guestBook.html") return getGuestBook(req, res);
   readContent(res, url);
 };
 
@@ -77,11 +87,47 @@ const renderGuestBook = (req, res) => {
 const renderError = (req, res, err) => {
   send(res, "Server Unresponding", 500);
 };
+const userData = JSON.parse(fs.readFileSync("./src/userData.json", "utf-8"));
+
+const getGuestBook = function(req, res) {
+  const cookie = req.headers["cookie"];
+  let content = html.loginTempelate;
+  if (userData[cookie]) {
+    content = html.commentTempelate(userData[cookie]);
+  }
+  send(res, content);
+  return;
+};
+
+const renderCommentPage = function(req, res) {
+  const text = req.body;
+  let { name } = readArgs(text);
+  name = unescape(name).replace(/\+/g," ");  
+  const hasValidCookie = Object.values(userData).includes(name);
+  if (!hasValidCookie) {
+    const date = new Date().toTimeString();
+    const cookie = `name=${name}${date}`;
+    const data = {};
+    data[cookie] = name;
+    res.setHeader("Set-Cookie", cookie);
+    fs.writeFile("./src/userData.json", JSON.stringify(data), err => {});
+  }
+  send(res, html.commentTempelate(name));
+};
+
+const renderLogout = function(req, res){
+  const cookie = req.headers["cookie"];
+  delete userData[cookie];
+  res.setHeader("Set-Cookie", '');
+  send(res, html.loginTempelate);
+}
 
 app.use(readBody);
 app.use(logRequest);
 app.get(renderURL);
+app.post('/logout', renderLogout)
 app.post("/getComments", renderGuestBook);
+app.post('/login', renderCommentPage)
 app.use(sendNotFound);
 app.error(renderError);
 module.exports = app.handleRequest.bind(app);
