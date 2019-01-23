@@ -33,8 +33,6 @@ const readBody = (req, res, next) => {
 
 const logRequest = (req, res, next) => {
   console.log(req.method, req.url);
-  console.log("headers =>", JSON.stringify(req.headers, null, 2));
-  console.log("body =>", req.body);
   next();
 };
 
@@ -114,10 +112,9 @@ const renderCommentPage = function(req, res) {
   if (!hasValidCookie) {
     const date = new Date().toTimeString();
     const cookie = `name=${name}${date}`;
-    const data = {};
-    data[cookie] = name;
+    userData[cookie] = name;
     res.setHeader("Set-Cookie", cookie);
-    fs.writeFile("./src/userData.json", JSON.stringify(data), err => {});
+    fs.writeFile("./src/userData.json", JSON.stringify(userData), err => {});
   }
   send(res, html.commentTempelate(name));
 };
@@ -131,7 +128,7 @@ const renderLogout = function(req, res){
 }
 
 app.use(readBody);
-// app.use(logRequest);
+app.use(logRequest);
 app.get(renderURL);
 app.post('/logout', renderLogout)
 app.post("/getComments", renderGuestBook);
