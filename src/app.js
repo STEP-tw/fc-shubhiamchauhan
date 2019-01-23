@@ -10,6 +10,14 @@ const getComments = () => {
   return JSON.parse(fs.readFileSync("./src/comments.json", "utf8"));
 };
 
+const getUserData = () => {
+  if (!fs.existsSync("./src/userData.json")) {
+    fs.writeFileSync("./src/userData.json", "{}");
+  }
+  return JSON.parse(fs.readFileSync("./src/userData.json", "utf8"));
+};
+
+const userData = getUserData();
 const comments = getComments();
 
 const readBody = (req, res, next) => {
@@ -87,7 +95,6 @@ const renderGuestBook = (req, res) => {
 const renderError = (req, res, err) => {
   send(res, "Server Unresponding", 500);
 };
-const userData = JSON.parse(fs.readFileSync("./src/userData.json", "utf-8"));
 
 const getGuestBook = function(req, res) {
   const cookie = req.headers["cookie"];
